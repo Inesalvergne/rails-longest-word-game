@@ -9,10 +9,14 @@ class GamesController < ApplicationController
 
   def score
     @word = params[:word]
-    english = check_if_exist(@word)
     @result = ""
-    if english["found"]
-      @result = "Congratulations #{@word} exists"
+    english = check_if_exist(@word)
+    exist = in_grid?(@word)
+
+    if english["found"] && exist == true
+      @result = "Congratulations! #{@word} is a valid English word!"
+    elsif exist == false
+      @result = "Sorru but #{@word} can't be built out of #{@letters}"
     else
       @result = "Sorry but #{@word} does not seem to be a valid English words"
     end
@@ -24,4 +28,11 @@ class GamesController < ApplicationController
     JSON.parse(string_serialized) # word is a hash, {"found"=>true, "word"=>"orange", "length"=>6}
   end
 
+  def in_grid?(attempt)
+    # not working
+    word = attempt.chars
+    word.all? do |letter|
+      @letters.include?(letter.upcase) && word.count(letter) <= grid.count(letter.upcase)
+    end
+  end
 end
